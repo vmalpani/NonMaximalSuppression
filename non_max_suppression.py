@@ -1,4 +1,7 @@
-def overlap(bbox1, bbox2):
+def intersection_over_union(bbox1, bbox2):
+    """
+    Calculates the intersection over union measure of two bounding boxes 
+    """
     bbox1_x1 = bbox1[0] 
     bbox1_x2 = bbox1[0] + bbox1[2]
     bbox1_y1 = bbox1[1]
@@ -20,14 +23,17 @@ def overlap(bbox1, bbox2):
     return intersection/float(union)
 
 
-def non_max_suppression(detections, threshold):
+def non_maximal_suppression(detections, threshold=0.5):
     """
-    Format: x, y, w, h
+    Performs non-maximal suppression using intersection over union measure and picking the max score detections
+    Bounding box format: x, y, w, h
     Input: [(11, 11, 24, 24, 0.75), (10, 11, 20, 20, 0.8), (11, 9, 24, 24, 0.7), (40, 42, 20, 20, 0.6)]
     Output: [(10, 11, 20, 20, 0.8), (40, 42, 20, 20, 0.6)]
     """
     if len(detections) < 2:
         raise ValueError("Need at least two bounding boxes")
+
+    # fourth index corresponds to detection score
     sorted_detections = sorted(detections,key=lambda x:x[4], reverse=True)
     final_detections = [sorted_detections[0]]
     sorted_detections_copy = list(sorted_detections[1:])
@@ -35,7 +41,7 @@ def non_max_suppression(detections, threshold):
 	for idx, bbox in enumerate(sorted_detections[1:]):
             flag_overlap = False
 	    for final_bbox in final_detections:
-		iou = overlap(bbox, final_bbox)
+		iou = intersection_over_union(bbox, final_bbox)
 		assert iou >= 0 and iou <= 1
 		if iou > threshold:
                     flag_overlap = True
@@ -49,5 +55,6 @@ def non_max_suppression(detections, threshold):
 
 if __name__ == "__main__":
     detections = [(11, 11, 24, 24, 0.75), (10, 11, 20, 20, 0.8), (11, 9, 24, 24, 0.7), (40, 42, 20, 20, 0.6)]
-    final_detections = non_max_suppression(detections, threshold=0.5)
-    print final_detections
+    print 'Detections: ' + ', '.join(map(str, detections))
+    final_detections = non_maximal_suppression(detections, threshold=0.5)
+    print 'Pruned Detections: ' + ', '.join(map(str, final_detections))

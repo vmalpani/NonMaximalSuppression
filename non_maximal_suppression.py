@@ -1,23 +1,19 @@
-def intersection_over_union(bbox1, bbox2):
+def intersection_over_union((left1, top1, width1, height1, score1), (left2, top2, width2, height2, score2)):
     """
     Calculates the intersection over union measure of two bounding boxes 
     """
-    bbox1_x1 = bbox1[0] 
-    bbox1_x2 = bbox1[0] + bbox1[2]
-    bbox1_y1 = bbox1[1]
-    bbox1_y2 = bbox1[1] + bbox1[3]
+    right1 = left1 + width1
+    bottom1 = top1 + height1
  
-    bbox2_x1 = bbox2[0] 
-    bbox2_x2 = bbox2[0] + bbox2[2]
-    bbox2_y1 = bbox2[1]
-    bbox2_y2 = bbox2[1] + bbox2[3]
+    right2 = left2 + width2
+    bottom2 = top2 + height2
 
-    intersect_width = max(0, min(bbox1_x2, bbox2_x2) - max(bbox1_x1, bbox2_x1))
-    intersect_height = max(0, min(bbox1_y2, bbox2_y2) - max(bbox1_y1, bbox2_y1))
+    intersect_width = max(0, min(right1, right2) - max(left1, left2))
+    intersect_height = max(0, min(bottom1, bottom2) - max(top1, top2))
     intersection = intersect_width * intersect_height
 
-    area1 = bbox1[2] * bbox1[3]
-    area2 = bbox2[2] * bbox2[3]
+    area1 = width1 * height1
+    area2 = width2 * height2
     union = area1 + area2 - intersection
 
     return intersection/float(union)
@@ -34,21 +30,18 @@ def non_maximal_suppression(detections, threshold=0.5):
         raise ValueError("Need at least two bounding boxes")
 
     # fourth index corresponds to detection score
-    sorted_detections = sorted(detections,key=lambda x:x[4], reverse=True)
-    final_detections = [sorted_detections[0]]
-    sorted_detections_copy = list(sorted_detections[1:])
-    while len(sorted_detections_copy) > 0:
-	for idx, bbox in enumerate(sorted_detections[1:]):
-            flag_overlap = False
-	    for final_bbox in final_detections:
-		iou = intersection_over_union(bbox, final_bbox)
-		assert iou >= 0 and iou <= 1
-		if iou > threshold:
-                    flag_overlap = True
-                    break
-            if not flag_overlap:
-                final_detections.append(bbox)
-            sorted_detections_copy.remove(bbox)
+    detections.sort(key=lambda x:x[4], reverse=True)
+    final_detections = [detections.pop(0)]
+    sorted_detections_copy = list(detections)
+    while len(detections) > 0:
+	bbox = detections.pop(0)
+        for final_bbox in final_detections:
+            iou = intersection_over_union(bbox, final_bbox)
+	    assert iou >= 0 and iou <= 1
+	    if iou > threshold:
+               break
+        else:
+            final_detections.append(bbox)
     return final_detections
     
 

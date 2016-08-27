@@ -22,7 +22,7 @@ def intersection_over_union((left1, top1, width1, height1, score1), (left2, top2
 def non_maximal_suppression(detections, threshold=0.5):
     """
     Performs non-maximal suppression using intersection over union measure and picking the max score detections
-    Bounding box format: x, y, w, h
+    Bounding box format: x, y, w, h, score
     Input: [(11, 11, 24, 24, 0.75), (10, 11, 20, 20, 0.8), (11, 9, 24, 24, 0.7), (40, 42, 20, 20, 0.6)]
     Output: [(10, 11, 20, 20, 0.8), (40, 42, 20, 20, 0.6)]
     """
@@ -32,7 +32,6 @@ def non_maximal_suppression(detections, threshold=0.5):
     # fourth index corresponds to detection score
     detections.sort(key=lambda x:x[4], reverse=True)
     final_detections = [detections.pop(0)]
-    sorted_detections_copy = list(detections)
     while len(detections) > 0:
 	bbox = detections.pop(0)
         for final_bbox in final_detections:

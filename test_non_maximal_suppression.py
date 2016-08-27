@@ -1,5 +1,5 @@
 import unittest
-import non_max_suppression as nms
+import non_maximal_suppression as nms
 
 
 class NMSTests(unittest.TestCase):

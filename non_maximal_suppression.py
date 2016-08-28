@@ -32,11 +32,10 @@ def non_maximal_suppression(detections, threshold=0.5):
     # fourth index corresponds to detection score
     detections.sort(key=lambda x:x[4], reverse=True)
     final_detections = [detections.pop(0)]
-    while len(detections) > 0:
-	bbox = detections.pop(0)
+    for bbox in detections:
         for final_bbox in final_detections:
             iou = intersection_over_union(bbox, final_bbox)
-	    assert iou >= 0 and iou <= 1
+	    assert 0 <= iou <= 1
 	    if iou > threshold:
                break
         else:

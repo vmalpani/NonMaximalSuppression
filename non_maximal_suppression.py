@@ -31,7 +31,7 @@ def non_maximal_suppression(detections, threshold=0.5):
 
     # fourth index corresponds to detection score
     detections.sort(key=lambda x:x[4], reverse=True)
-    final_detections = [detections.pop(0)]
+    final_detections = []
     for bbox in detections:
         for final_bbox in final_detections:
             iou = intersection_over_union(bbox, final_bbox)

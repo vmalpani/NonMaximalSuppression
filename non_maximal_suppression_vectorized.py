@@ -39,16 +39,14 @@ def non_maximal_suppression(detections, threshold=0.5):
 
     # fourth index corresponds to detection score
     detections = detections[detections[:,4].argsort()[::-1]]
+
     final_detections = np.array([detections[0]])
-    np.delete(detections, 0, axis=0)
-    while detections.size > 0:
-	bbox = detections[0]
+    for bbox in detections:
 	iou = intersection_over_union(bbox, final_detections)
         assert (iou >= 0).all() and (iou <= 1).all()
         overlap_idxs = np.where(iou > 0.5)
         if overlap_idxs[0].size == 0:
             final_detections = np.vstack((final_detections, bbox))
-        detections = np.delete(detections, 0, axis=0)
     return final_detections
     
 
